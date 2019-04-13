@@ -3,6 +3,6 @@
 
 #import <React/RCTBridgeModule.h>
 
-@interface InAppUtils : NSObject <RCTBridgeModule, SKProductsRequestDelegate, SKPaymentTransactionObserver, SKReceiptRefreshRequestDelegate>
+@interface InAppUtils : NSObject <RCTBridgeModule, SKProductsRequestDelegate, SKPaymentTransactionObserver>
 
 @end
