@@ -157,6 +157,37 @@ restoreCompletedTransactionsFailedWithError:(NSError *)error
     }
 }
 
+- (void)requestDidFinish:(SKRequest *)request {
+    NSString *key = RCTKeyForInstance(request);
+    RCTResponseSenderBlock callback = _callbacks[key];
+    if (callback) {
+        callback(@[[NSNull null]]);
+    } else {
+        RCTLogWarn(@"No callback registered for receipt refresh request");
+    }
+}
+
+RCT_EXPORT_METHOD(refreshReceipt:(RCTResponseSenderBlock)callback)
+{
+    SKReceiptRefreshRequest *refreshReceiptRequest = [[SKReceiptRefreshRequest alloc] initWithReceiptProperties:nil];
+    refreshReceiptRequest.delegate = self;
+    _callbacks[RCTKeyForInstance(refreshReceiptRequest)] = callback;
+    [refreshReceiptRequest start];
+}
+
+RCT_EXPORT_METHOD(refreshReceiptIfNeeded:(RCTResponseSenderBlock)callback)
+{
+    BOOL receiptExists = [[NSFileManager defaultManager] fileExistsAtPath:[[[NSBundle mainBundle] appStoreReceiptURL] path]];
+    if (receiptExists) {
+        callback(@[[NSNull null]]);
+    } else {
+        SKReceiptRefreshRequest *refreshReceiptRequest = [[SKReceiptRefreshRequest alloc] initWithReceiptProperties:nil];
+        refreshReceiptRequest.delegate = self;
+        _callbacks[RCTKeyForInstance(refreshReceiptRequest)] = callback;
+        [refreshReceiptRequest start];
+    }
+}
+
 RCT_EXPORT_METHOD(restorePurchases:(RCTResponseSenderBlock)callback)
 {
     NSString *restoreRequest = @"restoreRequest";
